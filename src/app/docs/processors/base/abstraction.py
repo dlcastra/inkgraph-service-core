@@ -13,14 +13,16 @@ class DocumentLoader(ABC):
     """Knows how to open a raw document from a path."""
 
     @abstractmethod
-    def load(self, path: Path) -> Document: ...
+    def load(self, path: Path) -> Document:
+        pass
 
 
 class ParagraphExtractor(ABC):
     """Turns a raw Document into a flat list of DocParagraph models."""
 
     @abstractmethod
-    def extract(self, document: Document) -> list[DocParagraph]: ...
+    def extract(self, document: Document) -> list[DocParagraph]:
+        pass
 
 
 class ChapterSplitter(ABC):
@@ -31,4 +33,31 @@ class ChapterSplitter(ABC):
         self, paragraphs: list[DocParagraph], chapter_heading_map: Optional[frozenset[str]] = None
     ) -> tuple[list[DocParagraph], list[Chapter]]:
         """Returns (preamble_paragraphs, chapters)."""
-        ...
+        pass
+
+
+class AsyncDocumentLoader(ABC):
+    """Knows how to open a raw document from a path."""
+
+    @abstractmethod
+    async def load(self, path: Path) -> Document:
+        pass
+
+
+class AsyncParagraphExtractor(ABC):
+    """Turns a raw Document into a flat list of DocParagraph models."""
+
+    @abstractmethod
+    async def extract(self, document: Document) -> list[DocParagraph]:
+        pass
+
+
+class AsyncChapterSplitter(ABC):
+    """Groups a flat list of paragraphs into chapters."""
+
+    @abstractmethod
+    async def split(
+        self, paragraphs: list[DocParagraph], chapter_heading_map: Optional[frozenset[str]] = None
+    ) -> tuple[list[DocParagraph], list[Chapter]]:
+        """Returns (preamble_paragraphs, chapters)."""
+        pass

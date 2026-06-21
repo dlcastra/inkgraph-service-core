@@ -1,7 +1,9 @@
+import asyncio
+
 from docx import Document
 from docx.oxml.ns import qn
 
-from src.app.docs.processors.base.abstraction import ParagraphExtractor
+from src.app.docs.processors.base.abstraction import ParagraphExtractor, AsyncParagraphExtractor
 from src.app.docs.processors.base.constants import HEADING_ID_RE, LEVEL_TO_HEADING, HEADING_NAME_RE
 from src.core.typing.docs.pages import DocParagraph, ParagraphType, HeadingLevel
 
@@ -77,3 +79,11 @@ class DocxParagraphExtractor(ParagraphExtractor):
             return None
         val = outlineLvl.get(qn("w:val"))
         return int(val) if val is not None else None
+
+
+class AsyncDocxParagraphExtractorWrapper(AsyncParagraphExtractor):
+    def __init__(self, sync_extractor: DocxParagraphExtractor) -> None:
+        self._sync_extractor = sync_extractor
+
+    async def extract(self, document: Document) -> list[DocParagraph]:
+        return await asyncio.to_thread(self._sync_extractor.extract, document)

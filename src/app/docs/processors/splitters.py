@@ -1,6 +1,7 @@
+import asyncio
 from typing import Optional
 
-from src.app.docs.processors.base.abstraction import ChapterSplitter
+from src.app.docs.processors.base.abstraction import ChapterSplitter, AsyncChapterSplitter
 from src.core.typing.docs.pages import DocParagraph, Chapter, ParagraphType
 
 
@@ -43,3 +44,13 @@ class HeadingOneChapterSplitter(ChapterSplitter):
         if chapter_heading_map is not None:
             return para.paragraph_type == ParagraphType.HEADING and para.style_name in chapter_heading_map
         return para.paragraph_type == ParagraphType.HEADING
+
+
+class AsyncHeadingOneChapterSplitterWrapper(AsyncChapterSplitter):
+    def __init__(self, sync_splitter: HeadingOneChapterSplitter) -> None:
+        self._sync_splitter = sync_splitter
+
+    async def split(
+        self, paragraphs: list[DocParagraph], chapter_heading_map: Optional[frozenset[str]] = None
+    ) -> tuple[list[DocParagraph], list[Chapter]]:
+        return await asyncio.to_thread(self._sync_splitter.split, paragraphs)
