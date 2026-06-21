@@ -1,5 +1,5 @@
+import io
 import asyncio
-from pathlib import Path
 
 from docx import Document
 
@@ -7,23 +7,17 @@ from src.app.docs.processors.base.abstraction import DocumentLoader, AsyncDocume
 
 
 class DocxLoader(DocumentLoader):
-    """Loads a .docx file using python-docx."""
+    """Loads a .docx document from a normalized BytesIO stream."""
 
-    def load(self, path: Path) -> Document:
-        if not path.exists():
-            raise FileNotFoundError(f"Document not found: {path}")
-
-        if path.suffix.lower() != ".docx":
-            raise ValueError(f"Expected a .docx file, got: {path.suffix}")
-
-        return Document(str(path))
+    def load(self, source: io.BytesIO) -> Document:
+        return Document(source)
 
 
 class AsyncDocxLoaderWrapper(AsyncDocumentLoader):
-    """Loads a .docx file using python-docx."""
+    """Async wrapper over DocxLoader — offloads blocking I/O to a thread."""
 
     def __init__(self, sync_loader: DocxLoader) -> None:
         self._sync_loader = sync_loader
 
-    async def load(self, path: Path) -> Document:
-        return await asyncio.to_thread(self._sync_loader.load, path)
+    async def load(self, source: io.BytesIO) -> Document:
+        return await asyncio.to_thread(self._sync_loader.load, source)

@@ -1,24 +1,32 @@
 from pathlib import Path
 
-from src.app.docs.processors import DocxLoader, DocxParagraphExtractor, HeadingOneChapterSplitter
+from src.app.docs.processors import (
+    AsyncDocxLoaderWrapper,
+    AsyncDocxParagraphExtractorWrapper,
+    AsyncHeadingOneChapterSplitterWrapper,
+    DocxLoader,
+    DocxParagraphExtractor,
+    HeadingOneChapterSplitter,
+)
 from src.app.docs.processors.base.abstraction import (
-    DocumentLoader,
-    ParagraphExtractor,
-    ChapterSplitter,
     AsyncDocumentLoader,
     AsyncParagraphExtractor,
     AsyncChapterSplitter,
+    DocumentLoader,
+    ParagraphExtractor,
+    ChapterSplitter,
 )
-from src.app.docs.processors.extractors import AsyncDocxParagraphExtractorWrapper
-from src.app.docs.processors.loaders import AsyncDocxLoaderWrapper
-from src.app.docs.processors.splitters import AsyncHeadingOneChapterSplitterWrapper
+from src.app.docs.processors.base.utils import normalize_doc_source
+from src.core.typing.docs.meta import DocSource
 from src.core.typing.docs.pages import ParsedDocument
 
 
 class BaseDocumentParserService:
     """
-    Parses a .docx file into a ParsedDocument.
+    Parses a document into a ParsedDocument.
 
+    Accepts str, Path, bytes, or io.BytesIO as the document source —
+    normalization to BytesIO is handled transparently before loading.
     Dependencies are injected so each piece can be swapped independently.
     """
 
@@ -32,14 +40,16 @@ class BaseDocumentParserService:
         self._extractor = extractor
         self._splitter = splitter
 
-    def parse(self, path: str | Path) -> ParsedDocument:
-        path = Path(path)
-        raw_doc = self._loader.load(path)
+    def parse(self, source: DocSource) -> ParsedDocument:
+        stream = normalize_doc_source(source)
+        source_path = str(source) if isinstance(source, (str, Path)) else ""
+
+        raw_doc = self._loader.load(stream)
         paragraphs = self._extractor.extract(raw_doc)
         preamble, chapters = self._splitter.split(paragraphs)
 
         return ParsedDocument(
-            source_path=str(path),
+            source_path=source_path,
             preamble_paragraphs=preamble,
             chapters=chapters,
         )
@@ -47,7 +57,9 @@ class BaseDocumentParserService:
 
 class AsyncBaseDocumentParserService:
     """
-    Parses a .docx file into a ParsedDocument asynchronously.
+    Parses a document into a ParsedDocument asynchronously.
+
+    Accepts str, Path, bytes, or io.BytesIO as the document source.
     """
 
     def __init__(
@@ -60,15 +72,16 @@ class AsyncBaseDocumentParserService:
         self._extractor = extractor
         self._splitter = splitter
 
-    async def parse(self, path: str | Path) -> ParsedDocument:
-        path = Path(path)
+    async def parse(self, source: DocSource) -> ParsedDocument:
+        stream = normalize_doc_source(source)
+        source_path = str(source) if isinstance(source, (str, Path)) else ""
 
-        raw_doc = await self._loader.load(path)
+        raw_doc = await self._loader.load(stream)
         paragraphs = await self._extractor.extract(raw_doc)
         preamble, chapters = await self._splitter.split(paragraphs)
 
         return ParsedDocument(
-            source_path=str(path),
+            source_path=source_path,
             preamble_paragraphs=preamble,
             chapters=chapters,
         )

@@ -1,19 +1,20 @@
 from __future__ import annotations
 
+import io
 from abc import ABC, abstractmethod
-from pathlib import Path
 from typing import Optional
 
 from docx import Document
 
-from src.core.typing.docs.pages import DocParagraph, Chapter, HeadingLevel
+from src.core.typing.docs.pages import DocParagraph, Chapter
 
 
 class DocumentLoader(ABC):
-    """Knows how to open a raw document from a path."""
+    """Knows how to open a raw document from a source."""
 
     @abstractmethod
-    def load(self, path: Path) -> Document:
+    def load(self, source: io.BytesIO) -> Document:
+        """Accepts a normalized BytesIO stream produced by normalize_doc_source()."""
         pass
 
 
@@ -37,10 +38,11 @@ class ChapterSplitter(ABC):
 
 
 class AsyncDocumentLoader(ABC):
-    """Knows how to open a raw document from a path."""
+    """Knows how to open a raw document from a source (async)."""
 
     @abstractmethod
-    async def load(self, path: Path) -> Document:
+    async def load(self, source: io.BytesIO) -> Document:
+        """Accepts a normalized BytesIO stream produced by normalize_doc_source()."""
         pass
 
 
