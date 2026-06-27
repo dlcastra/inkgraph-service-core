@@ -16,7 +16,7 @@ from src.app.docs.processors.base.abstraction import (
     ParagraphExtractor,
     ChapterSplitter,
 )
-from src.app.docs.processors.base.utils import normalize_doc_source
+from src.app.docs.utils import normalize_doc_source
 from src.core.typing.docs.meta import DocSource
 from src.core.typing.docs.pages import ParsedDocument
 
