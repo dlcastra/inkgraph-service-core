@@ -99,7 +99,7 @@ def build_base_doc_parser() -> BaseDocumentParserService:
 def build_async_doc_parser() -> AsyncBaseDocumentParserService:
     """Factory that wires up the default async production pipeline."""
     return AsyncBaseDocumentParserService(
-        loader=AsyncDocxLoaderWrapper(DocxLoader()),
-        extractor=AsyncDocxParagraphExtractorWrapper(DocxParagraphExtractor()),
-        splitter=AsyncHeadingOneChapterSplitterWrapper(HeadingOneChapterSplitter()),
+        loader=AsyncDocxLoaderWrapper(),
+        extractor=AsyncDocxParagraphExtractorWrapper(),
+        splitter=AsyncHeadingOneChapterSplitterWrapper(),
     )
