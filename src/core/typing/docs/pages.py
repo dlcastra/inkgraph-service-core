@@ -24,6 +24,7 @@ class DocParagraph(BaseModel):
     style_name: str
     paragraph_type: ParagraphType
     heading_level: HeadingLevel | None = None
+    font_size: float | int | None = Field(default=None, description="Font size in points, if available")
 
     @property
     def is_heading(self) -> bool:

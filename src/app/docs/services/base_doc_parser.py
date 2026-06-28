@@ -16,7 +16,7 @@ from src.app.docs.processors.base.abstraction import (
     ParagraphExtractor,
     ChapterSplitter,
 )
-from src.app.docs.processors.base.utils import normalize_doc_source
+from src.app.docs.utils import normalize_doc_source
 from src.core.typing.docs.meta import DocSource
 from src.core.typing.docs.pages import ParsedDocument
 
@@ -99,7 +99,7 @@ def build_base_doc_parser() -> BaseDocumentParserService:
 def build_async_doc_parser() -> AsyncBaseDocumentParserService:
     """Factory that wires up the default async production pipeline."""
     return AsyncBaseDocumentParserService(
-        loader=AsyncDocxLoaderWrapper(DocxLoader()),
-        extractor=AsyncDocxParagraphExtractorWrapper(DocxParagraphExtractor()),
-        splitter=AsyncHeadingOneChapterSplitterWrapper(HeadingOneChapterSplitter()),
+        loader=AsyncDocxLoaderWrapper(),
+        extractor=AsyncDocxParagraphExtractorWrapper(),
+        splitter=AsyncHeadingOneChapterSplitterWrapper(),
     )

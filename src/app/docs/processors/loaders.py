@@ -1,5 +1,6 @@
 import io
 import asyncio
+from typing import Optional
 
 from docx import Document
 
@@ -16,8 +17,8 @@ class DocxLoader(DocumentLoader):
 class AsyncDocxLoaderWrapper(AsyncDocumentLoader):
     """Async wrapper over DocxLoader — offloads blocking I/O to a thread."""
 
-    def __init__(self, sync_loader: DocxLoader) -> None:
-        self._sync_loader = sync_loader
+    def __init__(self, sync_loader: Optional[DocxLoader] = None) -> None:
+        self._sync_loader = sync_loader or DocxLoader()
 
     async def load(self, source: io.BytesIO) -> Document:
         return await asyncio.to_thread(self._sync_loader.load, source)

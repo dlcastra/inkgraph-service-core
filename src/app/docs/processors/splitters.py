@@ -47,8 +47,8 @@ class HeadingOneChapterSplitter(ChapterSplitter):
 
 
 class AsyncHeadingOneChapterSplitterWrapper(AsyncChapterSplitter):
-    def __init__(self, sync_splitter: HeadingOneChapterSplitter) -> None:
-        self._sync_splitter = sync_splitter
+    def __init__(self, sync_splitter: Optional[HeadingOneChapterSplitter] = None) -> None:
+        self._sync_splitter = sync_splitter or HeadingOneChapterSplitter()
 
     async def split(
         self, paragraphs: list[DocParagraph], chapter_heading_map: Optional[frozenset[str]] = None
